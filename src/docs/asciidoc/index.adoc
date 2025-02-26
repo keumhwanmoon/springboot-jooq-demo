@@ -84,9 +84,9 @@ include::{snippets}/user-create/http-request.adoc[]
 ===== 응답
 include::{snippets}/user-create/http-response.adoc[]
 
-=== 3. 사용자 조회 (ID 기반)
+=== 3-1. 사용자 조회 (ID 기반)
 
-`GET /api/v1/users/{id}`
+`GET /api/v1/users/+{id}+`
 
 특정 사용자의 상세 정보를 조회합니다.
 
@@ -102,6 +102,22 @@ include::{snippets}/user-get/http-request.adoc[]
 
 ===== 응답
 include::{snippets}/user-get/http-response.adoc[]
+
+=== 3-2. 사용자 조회 _ 오류
+
+`GET /api/v1/users/+{id}+`
+
+특정 사용자의 상세 정보를 조회합니다.
+
+==== 경로 변수
+include::{snippets}/user-get-error/path-parameters.adoc[]
+
+==== 예제
+===== 요청
+include::{snippets}/user-get-error/http-request.adoc[]
+
+===== 응답
+include::{snippets}/user-get-error/http-response.adoc[]
 
 === 4. 사용자 수정
 

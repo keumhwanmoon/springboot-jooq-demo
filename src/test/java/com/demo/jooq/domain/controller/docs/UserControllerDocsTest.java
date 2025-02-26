@@ -5,24 +5,34 @@ import com.demo.jooq.domain.models.UserReq;
 import com.demo.jooq.domain.models.UserRes;
 import com.demo.jooq.domain.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.RestDocumentationContextProvider;
+import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.modifyUris;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.replacePattern;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
@@ -31,6 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(UserController.class)
 @AutoConfigureRestDocs
+@ExtendWith(RestDocumentationExtension.class)
 public class UserControllerDocsTest {
 
     @Autowired
@@ -41,6 +52,21 @@ public class UserControllerDocsTest {
 
     @MockitoBean
     private UserService userService;
+
+    @BeforeEach
+    public void setUp(WebApplicationContext webApplicationContext,
+                      RestDocumentationContextProvider restDocumentation) {
+        this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
+                .apply(documentationConfiguration(restDocumentation)
+                        .operationPreprocessors()
+                        .withRequestDefaults(modifyUris()
+                                .scheme("https")
+                                .host("example.com")
+                                .removePort()
+                        )
+                )
+                .build();
+    }
 
     @Test
     void getAllUsers() throws Exception {
@@ -91,6 +117,33 @@ public class UserControllerDocsTest {
                                 fieldWithPath("phoneNumber").description("전화번호").optional(),
                                 fieldWithPath("mobilePhoneNumber").description("휴대전화 번호").optional(),
                                 fieldWithPath("picture").description("프로필 사진 URL").optional()
+                        ),
+                        responseFields(
+                                fieldWithPath("id").description("사용자 ID"),
+                                fieldWithPath("userName").description("사용자 이름"),
+                                fieldWithPath("loginId").description("로그인 ID"),
+                                fieldWithPath("email").description("이메일"),
+                                fieldWithPath("phoneNumber").description("전화번호").optional(),
+                                fieldWithPath("mobilePhoneNumber").description("휴대전화 번호").optional(),
+                                fieldWithPath("picture").description("프로필 사진 URL").optional(),
+                                fieldWithPath("createdAt").description("생성일시"),
+                                fieldWithPath("lastUpdatedAt").description("최근수정일시")
+                        )
+                ));
+    }
+
+    @Test
+    void getUserById() throws Exception {
+        UserRes user = createUserRes(1L, "user1", "user1@test.com");
+
+        given(userService.getUserById(1L)).willReturn(user);
+
+        mockMvc.perform(get("/api/users/{id}", 1L)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(document("user-get",
+                        pathParameters(
+                                parameterWithName("id").description("조회할 사용자 ID")
                         ),
                         responseFields(
                                 fieldWithPath("id").description("사용자 ID"),
