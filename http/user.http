@@ -1,0 +1,129 @@
+# https://www.jetbrains.com/help/idea/http-client-in-product-code-editor.html
+
+### 사용자 목록 조회
+# @name getUsers
+< {%
+    // 전역 변수 "host" 가져오기
+    const host = client.global.get("host");
+    // 전역 변수 "port" 가져오기
+    const port = client.global.get("port");
+
+    // "host"가 없으면 "http://localhost"로 설정
+    if (!host) {
+        client.global.set("host", "http://localhost");
+    }
+
+    // "port"가 없으면 "8080"으로 설정
+    if (!port) {
+        client.global.set("port", "8080");
+    }
+%}
+GET {{host}}:{{port}}/api/users
+Accept: application/json
+
+> {%
+    client.test("Response status should be 200", function () {
+        client.assert(response.status === 200, "Response status is not 200!");
+    });
+%}
+
+### 사용자 등록
+# @name registerUser
+POST {{host}}:{{port}}/api/users
+Accept: application/json
+Content-Type: application/json
+
+{
+  "loginId": "testuser1",
+  "userName": "홍길동",
+  "picture": "https://example.com/profile.jpg",
+  "email": "{{$random.email}}",
+  "phoneNumber": "010-1234-5678"
+}
+
+> {%
+    client.test("Ensure response status is 201", function () {
+        client.assert(response.status === 201, "Response status is not 201!");
+    });
+
+    if (response.status === 201) {
+        client.global.set("id", response.body.id)
+    } else {
+        throw new Error("User ID is not set in global variables");
+    }
+%}
+
+### 단일 사용자 조회
+# @name getUserById
+< {%
+    const id = client.global.get("id");
+
+    if (!id) {
+        throw new Error("User ID is not set in global variables");
+    }
+%}
+GET {{host}}:{{port}}/api/users/{{id}}
+Accept: application/json
+
+> {%
+    client.test("Verify response status is 200", function () {
+        client.assert(response.status === 200, "Response status is not 200!");
+    });
+%}
+
+### 단일 사용자 조회
+# @name getUserById
+GET {{host}}:{{port}}/api/users/999
+Accept: application/json
+
+> {%
+    client.test("Verify response status is 200", function () {
+        client.assert(response.status === 200, "Response status is not 200!");
+    });
+%}
+
+### 단일 사용자 수정
+# @name updateUser
+< {%
+    const id = client.global.get("id");
+
+    if (!id) {
+        throw new Error("User ID is not set in global variables");
+    }
+%}
+PUT {{host}}:{{port}}/api/users/{{id}}
+Accept: application/json
+Content-Type: application/json
+
+{
+  "loginId": "updatedId123",
+  "userName": "임꺽정",
+  "email": "updated_email@example.com",
+  "picture": "updated_profile.jpg",
+  "phoneNumber": "02-9876-5432",
+  "mobilePhoneNumber": "010-9876-5432"
+}
+
+> {%
+    client.test("Check response status is 200", function () {
+        client.assert(response.status === 200, "Response status is not 200!");
+    });
+%}
+
+### 단일 사용자 삭제
+# @name deleteUser
+< {%
+    const id = client.global.get("id");
+
+    if (!id) {
+        throw new Error("User ID is not set in global variables");
+    }
+%}
+DELETE {{host}}:{{port}}/api/users/{{id}}
+Accept: application/json
+
+> {%
+    client.test("Confirm response status is 204", function () {
+        client.assert(response.status === 204, "Response status is not 204!");
+    });
+%}
