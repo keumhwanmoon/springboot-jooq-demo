@@ -1,7 +1,7 @@
 package com.demo.jooq.domain.service;
 
 import com.demo.jooq.domain.models.UserRes;
-import com.demo.jooq.domain.repositories.UserDAO;
+import com.demo.jooq.domain.repositories.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,7 +21,7 @@ import static org.mockito.Mockito.when;
 class UserServiceTest {
 
     @Mock
-    private UserDAO userDAO;
+    private UserRepository userRepository;
 
     @InjectMocks
     private UserService userService;
@@ -31,7 +31,7 @@ class UserServiceTest {
     void getAll_ShouldReturnAllUsers() {
         // given
         List<UserRes> expectedUsers = createSampleUsers();
-        when(userDAO.findAllUsers()).thenReturn(expectedUsers);
+        when(userRepository.findAllUsers()).thenReturn(expectedUsers);
 
         // when
         List<UserRes> actualUsers = userService.getAll();

@@ -2,7 +2,7 @@ package com.demo.jooq.domain.service;
 
 import com.demo.jooq.domain.models.UserReq;
 import com.demo.jooq.domain.models.UserRes;
-import com.demo.jooq.domain.repositories.UserDAO;
+import com.demo.jooq.domain.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,33 +12,33 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Service
 public class UserService {
-    private final UserDAO userDAO;
+    private final UserRepository userRepository;
 
     public List<UserRes> getAll() {
-        return userDAO.findAllUsers();
+        return userRepository.findAllUsers();
     }
 
     public UserRes getUserById(Long id) {
-        return userDAO.findById(id);
+        return userRepository.findById(id);
     }
 
     public UserRes createUser(UserReq user) {
-        return userDAO.save(user);
+        return userRepository.save(user);
     }
 
     public Optional<UserRes> updateUser(Long id, UserReq user) {
-        if (!userDAO.existsById(id)) {
+        if (!userRepository.existsById(id)) {
             return Optional.empty();
         }
         user.setId(id);
-        return Optional.of(userDAO.save(user));
+        return Optional.of(userRepository.save(user));
     }
 
     public boolean deleteUser(Long id) {
-        if (!userDAO.existsById(id)) {
+        if (!userRepository.existsById(id)) {
             return false;
         }
-        userDAO.deleteById(id);
+        userRepository.deleteById(id);
         return true;
     }
 
