@@ -1,3 +1,7 @@
+plugins {
+    id 'com.gradle.enterprise' version '3.16.1'  // 최신 버전을 사용하세요
+}
+
 rootProject.name = 'springboot-jooq-demo'
 
 gradleEnterprise {
