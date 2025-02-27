@@ -133,7 +133,7 @@ public class UserControllerDocsTest {
     }
 
     @Test
-    void getUserById() throws Exception {
+    void getUser() throws Exception {
         UserRes user = createUserRes(1L, "user1", "user1@test.com");
 
         given(userService.getUserById(1L)).willReturn(user);
@@ -160,7 +160,7 @@ public class UserControllerDocsTest {
     }
 
     @Test
-    void getUserById_NotFound() throws Exception {
+    void getUser_NotFound() throws Exception {
         given(userService.getUserById(999L)).willThrow(new IllegalArgumentException("사용자를 찾을 수 없습니다: ID = " + 999L));
 
         mockMvc.perform(get("/api/users/{id}", 999L)

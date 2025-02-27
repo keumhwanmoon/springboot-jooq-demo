@@ -48,7 +48,7 @@ public class UserController {
      * @return 조회된 사용자 정보
      */
     @GetMapping("/{id}")
-    public ResponseEntity<UserRes> getUserById(@PathVariable Long id) {
+    public ResponseEntity<UserRes> getUser(@PathVariable Long id) {
         try {
             return ResponseEntity.ok(userService.getUserById(id));
         } catch (Exception e) {
@@ -57,7 +57,7 @@ public class UserController {
     }
 
     /**
-     * 새로운 사용자 생성
+     * 신규 사용자 생성
      *
      * @param user 생성할 사용자 정보
      * @return 생성된 사용자 정보
@@ -73,7 +73,7 @@ public class UserController {
     }
 
     /**
-     * 기존 사용자 정보 수정
+     * 사용자 수정
      *
      * @param id   수정할 사용자 ID
      * @param user 수정할 사용자 정보
